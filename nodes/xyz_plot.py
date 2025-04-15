@@ -54,7 +54,7 @@ class XyzPlot:
         return True
 
     def __init__(self) -> None:
-        self.output_folder_name = os.path.join(folder_paths.get_output_directory(), "xyz_plot")
+        self.output_folder_path = os.path.join(folder_paths.get_output_directory(), "xyz_plot")
         self.x_index = 0
         self.y_index = 0
 
@@ -82,22 +82,23 @@ class XyzPlot:
             img.save(target_path, 'JPEG', quality=90)
 
     def run(self, images, input_x, input_y, value_x, value_y, output_folder_name, prompt, unique_id, input_z=None, value_z="", extra_pnginfo=None):
-        output_folder_name = f"{output_folder_name}_{int(time.time())}"
-        self.output_folder_name = os.path.join(
-            folder_paths.get_output_directory(),
-            output_folder_name,
-        )
-
         if 'xyz_data' in prompt[unique_id]['inputs']:
             self.x_index = prompt[unique_id]['inputs']['xyz_data']['x_index']
             self.y_index = prompt[unique_id]['inputs']['xyz_data']['y_index']
             self.z_index = prompt[unique_id]['inputs']['xyz_data']['z_index']
-            self.output_folder_name = prompt[unique_id]['inputs']['xyz_data']['output_folder_name']
-            self.save_images(images, self.output_folder_name)
+            # Can use 'prompt[unique_id]['inputs']['xyz_data']['output_folder_name']' 
+            # to calculate the full output folder _path_ if necessary
+            self.save_images(images, self.output_folder_path)
             return ()
 
-        if os.path.exists(self.output_folder_name):
-            shutil.move(self.output_folder_name, self.output_folder_name + f'_old_{int(time.time())}')
+        output_folder_name = f"{output_folder_name}_{int(time.time())}"
+        self.output_folder_path = os.path.join(
+            folder_paths.get_output_directory(),
+            output_folder_name,
+        )
+
+        if os.path.exists(self.output_folder_path):
+            shutil.move(self.output_folder_path, self.output_folder_path + f'_old_{int(time.time())}')
 
         def filter_values(value):
             bool_map = {"true": True, "false": False}
@@ -182,7 +183,7 @@ class XyzPlot:
 
         # Check if the directory exists
         try:
-            os.makedirs(self.output_folder_name, exist_ok=True)
+            os.makedirs(self.output_folder_path, exist_ok=True)
         except Exception as e:
             raise Exception(f"Failed to create directory: {e}")
 
@@ -192,7 +193,7 @@ class XyzPlot:
         }
         if extra_pnginfo:
             workflow_filename = "workflow.json"
-            with open(f"{self.output_folder_name}/{workflow_filename}", "w", encoding="utf-8") as f:
+            with open(f"{self.output_folder_path}/{workflow_filename}", "w", encoding="utf-8") as f:
                 json.dump(extra_pnginfo['workflow'], f)
             retData["workflow"] = {
                 "url": f'{browser_base_url}/{workflow_filename}',
@@ -210,7 +211,7 @@ class XyzPlot:
             })
 
 
-        target_path = f"{self.output_folder_name}/result.json"
+        target_path = f"{self.output_folder_path}/result.json"
         with open(target_path, "w", encoding="utf-8") as f:
             json.dump(retData, f)
 
