@@ -83,7 +83,7 @@ class XyzPlot:
     def run(self, images, input_x, input_y, value_x, value_y, output_folder_name, prompt, unique_id, input_z=None, value_z="", extra_pnginfo=None):
         self.output_folder_name = os.path.join(
             folder_paths.get_output_directory(),
-            output_folder_name,
+            f"{output_folder_name}_{int(time.time())}",
         )
 
         if 'xyz_data' in prompt[unique_id]['inputs']:
