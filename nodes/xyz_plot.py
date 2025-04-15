@@ -69,15 +69,15 @@ class XyzPlot:
     def get_preview_url(folder_name, filename):
         return f"/browser/files/view?folder_type=outputs&filename={filename}&folder_path={folder_name}"
 
-    def save_images(self, images):
-        os.makedirs(self.output_folder_name, exist_ok=True)
+    def save_images(self, images, output_folder):
+        os.makedirs(output_folder, exist_ok=True)
 
         for index, image in enumerate(images):
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
             img = img.convert('RGB')
             filename = self.get_filename(self.x_index, self.y_index, self.z_index, index)
-            target_path = os.path.join(self.output_folder_name, filename)
+            target_path = os.path.join(output_folder, filename)
             img.save(target_path, 'JPEG', quality=90)
 
     def run(self, images, input_x, input_y, value_x, value_y, output_folder_name, prompt, unique_id, input_z=None, value_z="", extra_pnginfo=None):
@@ -91,7 +91,8 @@ class XyzPlot:
             self.x_index = prompt[unique_id]['inputs']['xyz_data']['x_index']
             self.y_index = prompt[unique_id]['inputs']['xyz_data']['y_index']
             self.z_index = prompt[unique_id]['inputs']['xyz_data']['z_index']
-            self.save_images(images)
+            self.output_folder_name = prompt[unique_id]['inputs']['xyz_data']['output_folder_name']
+            self.save_images(images, self.output_folder_name)
             return ()
 
         if os.path.exists(self.output_folder_name):
