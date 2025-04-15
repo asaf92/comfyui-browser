@@ -97,7 +97,12 @@ class XyzPlot:
             shutil.move(self.output_folder_name, self.output_folder_name + f'_old_{int(time.time())}')
 
         def filter_values(value):
-            return list(filter(lambda x: x != '', value.split(";")))
+            bool_map = {"true": True, "false": False}
+            return [ 
+                bool_map.get(part.strip().lower(), part.strip())
+                for part in value.split(";")
+                if part.strip()
+            ]
 
         def queue_new_prompt(prompt):
             data = json.dumps({
@@ -116,10 +121,8 @@ class XyzPlot:
         new_prompt = copy.deepcopy(prompt)
         ret = []
         for ix, vx in enumerate(values_x):
-            vx = vx.strip()
             row = []
             for iy, vy in enumerate(values_y):
-                vy = vy.strip()
                 new_prompt[input_x["node_id"]]["inputs"][input_x["widget_name"]] = vx
                 new_prompt[input_y["node_id"]]["inputs"][input_y["widget_name"]] = vy
 
@@ -134,7 +137,6 @@ class XyzPlot:
                 ceil = []
                 if (input_z and len(values_z) > 0):
                     for iz, vz in enumerate(values_z):
-                        vz = vz.strip()
                         new_prompt[input_z["node_id"]]["inputs"][input_z["widget_name"]] = vz
                         new_prompt[unique_id]['inputs']['xyz_data']['z_index'] = iz
                         queue_new_prompt(new_prompt)
@@ -149,7 +151,7 @@ class XyzPlot:
                             })
                         ceil.append({
                             "type": "axis",
-                            "value": vz,
+                            "value": str(vz),
                             "children": zCeil,
                         })
                 else:
@@ -165,13 +167,13 @@ class XyzPlot:
 
                 row.append({
                     "type": "axis",
-                    "value": vy,
+                    "value": str(vy),
                     "children": ceil,
                 })
 
             ret.append({
                 "type": "axis",
-                "value": vx,
+                "value": str(vx),
                 "children": row,
             })
 
