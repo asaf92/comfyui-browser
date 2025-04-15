@@ -8,7 +8,7 @@ import copy
 
 import folder_paths
 
-from ..utils import SERVER_BASE_URL, http_client
+from ..utils import SERVER_BASE_URL, http_client, log
 
 class XyzPlot:
     CATEGORY = "Browser"
@@ -72,6 +72,7 @@ class XyzPlot:
     def save_images(self, images, output_folder):
         os.makedirs(output_folder, exist_ok=True)
 
+        log(f"Saving images to {output_folder}")
         for index, image in enumerate(images):
             i = 255. * image.cpu().numpy()
             img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
