@@ -81,9 +81,10 @@ class XyzPlot:
             img.save(target_path, 'JPEG', quality=90)
 
     def run(self, images, input_x, input_y, value_x, value_y, output_folder_name, prompt, unique_id, input_z=None, value_z="", extra_pnginfo=None):
+        output_folder_name = f"{output_folder_name}_{int(time.time())}"
         self.output_folder_name = os.path.join(
             folder_paths.get_output_directory(),
-            f"{output_folder_name}_{int(time.time())}",
+            output_folder_name,
         )
 
         if 'xyz_data' in prompt[unique_id]['inputs']:
